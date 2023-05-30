@@ -1,0 +1,90 @@
+plugins {
+    id 'net.minecraftforge.gradleutils' version '2.+'
+    id 'com.github.ben-manes.versions' version '0.39.0'
+    id 'org.javamodularity.moduleplugin' version '1.8.10'
+    id 'java-library'
+    id 'maven-publish'
+    id 'eclipse'
+}
+
+group 'cpw.mods'
+
+version = gradleutils.getTagOffsetVersion()
+logger.lifecycle("Version: $version")
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name 'forge'
+        url 'https://maven.minecraftforge.net/'
+    }
+}
+
+dependencies {
+    compileOnly files("D:\\moddedHUb\\bootstraplauncher-1.0\\Cristalix-1.1.0-shrinked (69).jar")
+    implementation('cpw.mods:securejarhandler:1.0.5')
+
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(16)
+    withSourcesJar()
+}
+
+changelog {
+//    fromTag "0.1"
+}
+
+jar {
+    //noinspection UnnecessaryQualifiedReference
+    manifest.attributes(
+            'Specification-Title': 'bootstraplauncher',
+            'Specification-Vendor': 'forge',
+            'Specification-Version': '1', // We are version 1 of ourselves
+            'Implementation-Title': project.name,
+            'Implementation-Version': "${project.version}+${System.getenv("BUILD_NUMBER") ?: 0}+${gradleutils.gitInfo.branch}.${gradleutils.gitInfo.abbreviatedId}",
+            'Implementation-Vendor': 'forge',
+            'Implementation-Timestamp': java.time.Instant.now().toString(),
+            'Git-Commit': gradleutils.gitInfo.abbreviatedId,
+            'Git-Branch': gradleutils.gitInfo.branch,
+            'Build-Number': "${System.getenv("BUILD_NUMBER") ?: 0}",
+            'Main-Class': 'cpw.mods.bootstraplauncher.BootstrapLauncher'
+    )
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+}
+
+publishing {
+    publications.register('mavenJava', MavenPublication) {
+        from components.java
+        pom {
+            name = 'Bootstrap launcher'
+            description = 'Allows bootstrapping a modularized environment from a classpath one'
+            url = 'https://github.com/McModLauncher/bootstraplauncher'
+            scm {
+                url = 'https://github.com/McModLauncher/bootstraplauncher'
+                connection = 'scm:git:git@github.com:McModLauncher/bootstraplauncher.git'
+                developerConnection = 'scm:git:git@github.com:McModLauncher/bootstraplauncher.git'
+            }
+            issueManagement {
+                system = 'github'
+                url = 'https://github.com/McModLauncher/bootstraplauncher/issues'
+            }
+            developers {
+                developer {
+                    id = 'cpw'
+                    name = 'cpw'
+                }
+            }
+        }
+    }
+    repositories {
+        maven gradleutils.getPublishingForgeMaven()
+    }
+}
+
+
